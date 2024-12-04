@@ -1,50 +1,12 @@
 import React, { useState } from "react";
 import { PredictionForm } from "../index";
-
+import { useSelector } from "react-redux";
 function SoilInputForm() {
     const [loading, setLoading] = useState(true);
+    const predictedData = useSelector((state) => state.modelData.data)
+    console.log("the predicted data is", predictedData)
 
-    const data = [
-        {
-
-
-            "area_hectares": 2,
-            "crop": "apple",
-            "growth_duration_months": 8,
-            "predicted_price_per_kg": 185,
-            "total_profit": 740000
-        },
-        {
-            "area_hectares": 2,
-            "crop": "papaya",
-            "growth_duration_months": 10,
-            "predicted_price_per_kg": 95,
-            "total_profit": 380000
-        },
-        {
-            "area_hectares": 2,
-            "crop": "grapes",
-            "growth_duration_months": 7,
-            "predicted_price_per_kg": 210,
-            "total_profit": 840000
-        },
-        {
-            "area_hectares": 2,
-            "crop": "banana",
-            "growth_duration_months": 9,
-            "predicted_price_per_kg": 90,
-            "total_profit": 360000
-        },
-        {
-            "area_hectares": 2,
-            "crop": "muskmelon",
-            "growth_duration_months": 3,
-            "predicted_price_per_kg": 100,
-            "total_profit": 400000
-        }
-
-
-    ]
+ 
     // You can trigger the loading state with some event, for example:
     // useEffect or a button click can set setLoading(true);
 
@@ -69,7 +31,7 @@ function SoilInputForm() {
                 <div id="ans" className="">
                     <div className="card bg-base-100 w-full shadow-xl flex flex-col items-center justify-center  gap-2">
                         {
-                            data.map((item, index) => (
+                            predictedData.map((item, index) => (
                                 <div className="card-body" key={index}>
                                     <h2 className="card-title">Crop Name: {item.crop}</h2>
                                     <p>Price Per Kg: {item.predicted_price_per_kg}</p>

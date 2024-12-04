@@ -1,5 +1,3 @@
-# model_path = "./pickle_files/model.pkl"
-
 from flask import Flask, request, jsonify
 import pickle
 
@@ -12,28 +10,11 @@ with open(model_path, "rb") as file:
 
 # Crop dictionary (encoding: crop names to integers)
 crop_dict = {
-    'rice': 1,
-    'maize': 2,
-    'jute': 3,
-    'cotton': 4,
-    'coconut': 5,
-    'papaya': 6,
-    'orange': 7,
-    'apple': 8,
-    'muskmelon': 9,
-    'watermelon': 10,
-    'grapes': 11,
-    'mango': 12,
-    'banana': 13,
-    'pomegranate': 14,
-    'lentil': 15,
-    'blackgram': 16,
-    'mungbean': 17,
-    'mothbeans': 18,
-    'pigeonpeas': 19,
-    'kidneybeans': 20,
-    'chickpea': 21,
-    'coffee': 22
+    'rice': 1, 'maize': 2, 'jute': 3, 'cotton': 4, 'coconut': 5, 'papaya': 6,
+    'orange': 7, 'apple': 8, 'muskmelon': 9, 'watermelon': 10, 'grapes': 11,
+    'mango': 12, 'banana': 13, 'pomegranate': 14, 'lentil': 15, 'blackgram': 16,
+    'mungbean': 17, 'mothbeans': 18, 'pigeonpeas': 19, 'kidneybeans': 20,
+    'chickpea': 21, 'coffee': 22
 }
 
 # Reverse crop dictionary: map encoded values back to crop names
@@ -41,27 +22,10 @@ reversed_crop_dict = {value: key for key, value in crop_dict.items()}
 
 # Crop growth durations in months
 crop_growth_duration = {
-    "rice": 4,
-    "maize": 3,
-    "jute": 4,
-    "cotton": 6,
-    "coconut": 12,
-    "papaya": 10,
-    "orange": 8,
-    "apple": 8,
-    "muskmelon": 3,
-    "watermelon": 3,
-    "grapes": 7,
-    "mango": 12,
-    "banana": 9,
-    "pomegranate": 6,
-    "lentil": 4,
-    "blackgram": 3,
-    "mungbean": 3,
-    "mothbeans": 3,
-    "pigeonpeas": 5,
-    "kidneybeans": 4,
-    "chickpea": 5,
+    "rice": 4, "maize": 3, "jute": 4, "cotton": 6, "coconut": 12, "papaya": 10,
+    "orange": 8, "apple": 8, "muskmelon": 3, "watermelon": 3, "grapes": 7, 
+    "mango": 12, "banana": 9, "pomegranate": 6, "lentil": 4, "blackgram": 3,
+    "mungbean": 3, "mothbeans": 3, "pigeonpeas": 5, "kidneybeans": 4, "chickpea": 5,
     "coffee": 12
 }
 
@@ -95,27 +59,44 @@ crop_prices_dict = {
 def get_crop_name(encoded_value):
     return reversed_crop_dict.get(encoded_value, "Unknown Crop")
 
+@app.route('/api/submit', methods=['POST'])
+def submit():
+    try:
+        data = request.json  # Get the input JSON data
+
+        # You can perform any required operations or predictions here
+
+        return jsonify({"message": "Data received successfully!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/predict_top5', methods=['POST'])
 def predict_top5():
     try:
         data = request.json
+        print("the data from node is ", data)
 
-        # Extract features from request
+        # Convert string inputs to the appropriate numerical types
         features = [
-            data['n'], data['p'], data['k'], data['temperature'], 
-            data['humidity'], data['ph'], data['rainfall']
+            int(data['n']),             # Nitrogen, converting to integer
+            int(data['p']),             # Phosphorus, converting to integer
+            int(data['k']),             # Potassium, converting to integer
+            float(data['temperature']), # Temperature, converting to float
+            float(data['humidity']),    # Humidity, converting to float
+            float(data['ph']),          # pH, converting to float
+            float(data['rainfall'])     # Rainfall, converting to float
         ]
 
-        # Predict probabilities
+        # Predict probabilities using the loaded model
         probabilities = crop_model.predict_proba([features])[0]
 
-        # Get sorted indices of probabilities
+        # Sort the probabilities and select the top 5 crops
         sorted_indices = probabilities.argsort()[-5:][::-1]
 
-        # Map indices to crop names and calculate revenue
+        # Prepare the crop information
         top5_crops = []
         for index in sorted_indices:
-            crop_name = get_crop_name(index + 1)  # +1 to match encoding
+            crop_name = get_crop_name(index + 1)  # +1 to match the encoding of crop names
             growth_duration = crop_growth_duration.get(crop_name, "Unknown")
             price_list = crop_prices_dict.get(crop_name, [])
             predicted_price = (
@@ -128,9 +109,9 @@ def predict_top5():
                 "predicted_price_per_kg": predicted_price,
             }
 
-            # Add potential profit if area is provided
+            # Add potential profit if area is provided in the input data
             if "area" in data and predicted_price != "Unknown":
-                area = data["area"]  # in hectares
+                area = float(data["area"])  # Convert area to float
                 yield_per_hectare = 2000  # Example: fixed value for yield per hectare
                 total_profit = area * yield_per_hectare * predicted_price
                 crop_info["area_hectares"] = area
@@ -140,11 +121,12 @@ def predict_top5():
 
         return jsonify({"top_5_crops": top5_crops})
 
-
     except KeyError as e:
-        return jsonify({"error": f"Missing input: {str(e)}"}), 400
+        return jsonify({"error": f"Missing expected input: {str(e)}"}), 400
+    except ValueError as e:
+        return jsonify({"error": f"Invalid value for input: {str(e)}"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)

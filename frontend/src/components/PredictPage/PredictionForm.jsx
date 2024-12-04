@@ -1,40 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-
+import { setModelData } from '../../store/dataSlice';
+import { useDispatch } from 'react-redux';
 function PredictionForm() {
-    const [data, setData] = useState(null);
-    const latitude = useSelector((state) => state.location.latitude);
-    const longitude = useSelector((state) => state.location.longitude);
+    const lat = useSelector((state) => state.location.latitude); // Get latitude from Redux state
+    const long = useSelector((state) => state.location.longitude); // Get longitude from Redux state
+    
+    const dispatch = useDispatch()
     const [formData, setFormData] = useState({
-        n: '',
-        p: '',
-        k: '',
-        humidity: '',
-        ph: '',
-        temperature: '',
-        area: '',
-        rainfall:''
+        n: "",
+        p: "",
+        k: "",
+        humidity: "",
+        ph: "",
+        temperature: "",
+        area: "",
+        rainfall: "",
+        lat, // Assign latitude value from Redux
+        long, // Assign longitude value from Redux
     });
-
-    // Fetch weather data using useEffect
-    useEffect(() => {
-        const fetchWeatherData = async () => {
-            try {
-                const response = await axios.get(
-                    `https://pro.openweathermap.org/data/2.5/forecast/climate?lat=${latitude}&lon=${longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}`
-                );
-                setData(response.data); // Store the fetched data in the state
-                console.log('Weather Data:', response);
-            } catch (error) {
-                console.error('Error fetching weather data:', error);
-            }
-        };
-
-        if (latitude && longitude) {
-            fetchWeatherData(); // Fetch data only if latitude and longitude are available
-        }
-    }, [latitude, longitude]); // Re-run the effect if latitude or longitude changes
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -47,23 +32,32 @@ function PredictionForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Form Data Submitted: ', formData);
-        // Here you can send the formData to your backend API
-        const response = await axios.post(`${import.meta.env.VITE_NODE_BACKEND_URL}/submit`)
+        // Send the form data to your backend API
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_NODE_BACKEND_URL}/submit`, formData);
+            console.log('Prediction Response:', response.data.processedData.top_5_crops
+            );
+            dispatch(setModelData(response.data.processedData.top_5_crops))
+            
+        } catch (error) {
+            console.error('Error submitting form data:', error);
+        }
     };
 
     return (
         <div className="container mx-auto p-4">
             <h2 className="text-xl font-bold text-center mb-6">Soil Health Input</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
+
                 <div className="flex flex-col">
-                    <label htmlFor="nitrogen" className="font-semibold">
+                    <label htmlFor="n" className="font-semibold">
                         Nitrogen Content (kg/ha):
                     </label>
                     <input
                         type="number"
-                        id="nitrogen"
-                        name="nitrogen"
-                        value={formData.nitrogen}
+                        id="n"
+                        name="n"
+                        value={formData.n}
                         onChange={handleChange}
                         required
                         className="input input-bordered"
@@ -71,14 +65,14 @@ function PredictionForm() {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="phosphorus" className="font-semibold">
+                    <label htmlFor="p" className="font-semibold">
                         Phosphorus Content (kg/ha):
                     </label>
                     <input
                         type="number"
-                        id="phosphorus"
-                        name="phosphorus"
-                        value={formData.phosphorus}
+                        id="p"
+                        name="p"
+                        value={formData.p}
                         onChange={handleChange}
                         required
                         className="input input-bordered"
@@ -86,14 +80,14 @@ function PredictionForm() {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="potassium" className="font-semibold">
+                    <label htmlFor="k" className="font-semibold">
                         Potassium Content (kg/ha):
                     </label>
                     <input
                         type="number"
-                        id="potassium"
-                        name="potassium"
-                        value={formData.potassium}
+                        id="k"
+                        name="k"
+                        value={formData.k}
                         onChange={handleChange}
                         required
                         className="input input-bordered"
@@ -101,14 +95,14 @@ function PredictionForm() {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="soilHumidity" className="font-semibold">
+                    <label htmlFor="humidity" className="font-semibold">
                         Soil Humidity (%):
                     </label>
                     <input
                         type="number"
-                        id="soilHumidity"
-                        name="soilHumidity"
-                        value={formData.soilHumidity}
+                        id="humidity"
+                        name="humidity"
+                        value={formData.humidity}
                         onChange={handleChange}
                         required
                         className="input input-bordered"
@@ -116,14 +110,14 @@ function PredictionForm() {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="soilPH" className="font-semibold">
+                    <label htmlFor="ph" className="font-semibold">
                         Soil pH Level:
                     </label>
                     <input
                         type="number"
-                        id="soilPH"
-                        name="soilPH"
-                        value={formData.soilPH}
+                        id="ph"
+                        name="ph"
+                        value={formData.ph}
                         onChange={handleChange}
                         required
                         className="input input-bordered"
@@ -134,29 +128,14 @@ function PredictionForm() {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="organicMatter" className="font-semibold">
-                        Organic Matter (%):
-                    </label>
-                    <input
-                        type="number"
-                        id="organicMatter"
-                        name="organicMatter"
-                        value={formData.organicMatter}
-                        onChange={handleChange}
-                        required
-                        className="input input-bordered"
-                    />
-                </div>
-
-                <div className="flex flex-col">
-                    <label htmlFor="soilTemperature" className="font-semibold">
+                    <label htmlFor="temperature" className="font-semibold">
                         Soil Temperature (°C):
                     </label>
                     <input
                         type="number"
-                        id="soilTemperature"
-                        name="soilTemperature"
-                        value={formData.soilTemperature}
+                        id="temperature"
+                        name="temperature"
+                        value={formData.temperature}
                         onChange={handleChange}
                         required
                         className="input input-bordered"
@@ -164,23 +143,37 @@ function PredictionForm() {
                     />
                 </div>
 
-                {/* New Field for Area of Land */}
                 <div className="flex flex-col">
-                    <label htmlFor="areaOfLand" className="font-semibold">
+                    <label htmlFor="area" className="font-semibold">
                         Area of Land (hectares):
                     </label>
                     <input
                         type="number"
-                        id="areaOfLand"
-                        name="areaOfLand"
-                        value={formData.areaOfLand}
+                        id="area"
+                        name="area"
+                        value={formData.area}
                         onChange={handleChange}
                         required
                         className="input input-bordered"
                     />
                 </div>
 
-                <div className="flex justify-center ">
+                <div className="flex flex-col">
+                    <label htmlFor="rainfall" className="font-semibold">
+                        Rainfall (mm):
+                    </label>
+                    <input
+                        type="number"
+                        id="rainfall"
+                        name="rainfall"
+                        value={formData.rainfall}
+                        onChange={handleChange}
+                        required
+                        className="input input-bordered"
+                    />
+                </div>
+
+                <div className="flex justify-center">
                     <button type="submit" className="btn btn-primary w-full">
                         Submit
                     </button>
