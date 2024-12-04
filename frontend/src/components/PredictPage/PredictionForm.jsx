@@ -1,16 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 function PredictionForm() {
+    const [data, setData] = useState(null);
+    const latitude = useSelector((state) => state.location.latitude);
+    const longitude = useSelector((state) => state.location.longitude);
     const [formData, setFormData] = useState({
-        nitrogen: "",
-        phosphorus: "",
-        potassium: "",
-        soilHumidity: "",
-        soilPH: "",
-        organicMatter: "",
-        soilTemperature: "",
+        n: '',
+        p: '',
+        k: '',
+        humidity: '',
+        ph: '',
+        temperature: '',
+        area: '',
+        rainfall:''
     });
 
+    // Fetch weather data using useEffect
+    useEffect(() => {
+        const fetchWeatherData = async () => {
+            try {
+                const response = await axios.get(
+                    `https://pro.openweathermap.org/data/2.5/forecast/climate?lat=${latitude}&lon=${longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}`
+                );
+                setData(response.data); // Store the fetched data in the state
+                console.log('Weather Data:', response);
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            }
+        };
+
+        if (latitude && longitude) {
+            fetchWeatherData(); // Fetch data only if latitude and longitude are available
+        }
+    }, [latitude, longitude]); // Re-run the effect if latitude or longitude changes
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,11 +46,12 @@ function PredictionForm() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Form Data Submitted: ", formData);
+        console.log('Form Data Submitted: ', formData);
+        // Here you can send the formData to your backend API
     };
 
     return (
-        <div className="container mx-auto p-4 ">
+        <div className="container mx-auto p-4">
             <h2 className="text-xl font-bold text-center mb-6">Soil Health Input</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex flex-col">
@@ -138,6 +163,22 @@ function PredictionForm() {
                     />
                 </div>
 
+                {/* New Field for Area of Land */}
+                <div className="flex flex-col">
+                    <label htmlFor="areaOfLand" className="font-semibold">
+                        Area of Land (hectares):
+                    </label>
+                    <input
+                        type="number"
+                        id="areaOfLand"
+                        name="areaOfLand"
+                        value={formData.areaOfLand}
+                        onChange={handleChange}
+                        required
+                        className="input input-bordered"
+                    />
+                </div>
+
                 <div className="flex justify-center ">
                     <button type="submit" className="btn btn-primary w-full">
                         Submit
@@ -145,7 +186,7 @@ function PredictionForm() {
                 </div>
             </form>
         </div>
-    )
+    );
 }
 
-export default PredictionForm
+export default PredictionForm;
