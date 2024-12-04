@@ -8,15 +8,18 @@ app.use(express.json());
 const router = Router();
 
 router.post('/submit', async (req, res) => {
-    const { n, p, k, humidity, ph, temperature, area } = req.body;
+    const { n, p, k, humidity, ph, temperature, area, lat, long } = req.body;
 
-    if (!n || !p || !k || !humidity || !ph || !temperature || !area) {
+    if (!n || !p || !k || !humidity || !ph || !temperature || !area ||!lat || !long) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
+    const response =await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=bce3dfcaa212acbda967b389e2c23f05`)
+    temperature = response.data.main.temp;
+    humidity = response.data.main.humidity;
     try {
         // Make the external POST request with the data
-        const response = await axios.post('https://example.com/api', {
+        const response = await axios.post('http://192.168.102.72:5000/predict_top5', {
             n,
             p,
             k,
