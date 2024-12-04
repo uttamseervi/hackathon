@@ -4,6 +4,9 @@ import Dashboard from "./dashboard/Dashboard";
 import Suggestions from "./suggestions/Suggestions";
 import SuggestionsPage from "./suggestionsPage/SuggestionsPage";
 import PredictPage from "./PredictPage/PredictPage";
+import TypewriterComponent from "./animations/typeAnimations/Typewritter";
+import PredictionForm from "./PredictPage/PredictionForm";
+
 
 export {
     Navbar,
@@ -11,5 +14,7 @@ export {
     Dashboard,
     Suggestions,
     SuggestionsPage,
-    PredictPage
+    PredictPage,
+    TypewriterComponent,
+    PredictionForm
 }
