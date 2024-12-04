@@ -14,7 +14,9 @@ function PredictionForm() {
         ph: '',
         temperature: '',
         area: '',
-        rainfall:''
+        rainfall: '',
+        lat: latitude,
+        long: longitude
     });
 
     // Fetch weather data using useEffect
@@ -44,10 +46,11 @@ function PredictionForm() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Form Data Submitted: ', formData);
         // Here you can send the formData to your backend API
+        const response = await axios.post(`${import.meta.env.VITE_NODE_BACKEND_URL}/submit`)
     };
 
     return (
