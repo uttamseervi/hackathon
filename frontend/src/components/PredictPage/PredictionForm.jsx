@@ -14,9 +14,7 @@ function PredictionForm() {
         ph: '',
         temperature: '',
         area: '',
-        rainfall: '',
-        lat: latitude,
-        long: longitude
+        rainfall:''
     });
 
     // Fetch weather data using useEffect
