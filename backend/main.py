@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
 import pickle
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
 app = Flask(__name__)
 
 # Load the crop prediction model
-model_path = "./pickle_files/model.pkl"
+model_path = "./pickle_files/knn.pkl"
 with open(model_path, "rb") as file:
     crop_model = pickle.load(file)
 
@@ -70,6 +72,33 @@ def submit():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/dummy', methods=['GET'])
+def dummy():
+    try:
+        # Load the dataset (assuming it's a CSV file, update the path if necessary)
+        df = pd.read_csv("./datasets/Crop_recommendation.csv")
+        
+        # Split the dataset into features and labels (assuming your CSV has 'features' and 'labels')
+        X = df.drop('label', axis=1)  # Assuming 'label' is the column to predict (adjust as necessary)
+        y = df['label']  # The target variable (crop names or integers)
+        
+        # Split the data into training and testing sets (80% train, 20% test)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        # Use the model to predict on the test data
+        predictions = crop_model.predict(X_test)  # Predict crop labels from X_test
+        
+        # Print predictions for testing (you can replace this with return statements or logging if needed)
+        for idx, prediction in enumerate(predictions):
+            print(f"Test Sample {idx}: Predicted Crop: {get_crop_name(prediction)}")
+
+        return jsonify({"message": "Predictions printed to console."}), 200
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": f"Error occurred while processing: {str(e)}"}), 500
+
+
 @app.route('/predict_top5', methods=['POST'])
 def predict_top5():
     try:
@@ -128,5 +157,6 @@ def predict_top5():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
