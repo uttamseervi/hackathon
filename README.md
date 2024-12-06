@@ -16,48 +16,55 @@ This project leverages Artificial Intelligence (AI) to optimize climate-resilien
 
 3. **Revenue Prediction**  
    Estimate potential revenue by comparing the predicted harvest with historical market data, aligning with previous years' trends.
-4. **Gemini Addon"
-   Just added to provide best experience
-   (Note: This ai interation is completly different and no where related to our trained model, we just added to make more better ux)
 
-##Photos
-![WhatsApp Image 2024-12-05 at 06 44 49_e176d19c](https://github.com/user-attachments/assets/69970efa-60bd-40d5-8b06-42f404494c7d)
-![WhatsApp Image 2024-12-05 at 06 45 52_a3ff7a9b](https://github.com/user-attachments/assets/841fa4d0-7a94-4dbc-9179-7ba7e5f1fcf3)
-![WhatsApp Image 2024-12-05 at 06 45 08_0e221500](https://github.com/user-attachments/assets/0191dc1b-f988-4cd5-910c-a4f81a389449)
-![WhatsApp Image 2024-12-05 at 07 02 44_589df9f9](https://github.com/user-attachments/assets/e7c02cbf-f7d9-4e6c-ac73-a78fd7495dd2)
+4. **Gemini Addon**  
+   An additional feature to enhance the user experience.  
+   *(Note: This AI interaction is completely separate from the trained model and is included solely for improved UX.)*
 
+## Photos
+
+Below are some screenshots showcasing the project interface:
+
+| ![Screenshot 1](https://github.com/user-attachments/assets/69970efa-60bd-40d5-8b06-42f404494c7d) | ![Screenshot 2](https://github.com/user-attachments/assets/841fa4d0-7a94-4dbc-9179-7ba7e5f1fcf3) |
+|:------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------:|
+| ![Screenshot 3](https://github.com/user-attachments/assets/0191dc1b-f988-4cd5-910c-a4f81a389449) | ![Screenshot 4](https://github.com/user-attachments/assets/e7c02cbf-f7d9-4e6c-ac73-a78fd7495dd2) |
 
 ## Dataset
 
-The project uses two datasets: Crop_Recommendation and Crop_Prices, which contain features relevant to predicting suitable crops for specific conditions. The datasets include the following key features:
+The project uses two datasets: **Crop_Recommendation** and **Crop_Prices**, which include features relevant to predicting suitable crops for specific conditions. Key features include:  
+- **N** (Nitrogen)  
+- **P** (Phosphorus)  
+- **K** (Potassium)  
+- **Temperature**  
+- **Humidity**  
+- **pH**  
+- **Rainfall**  
 
-N (Nitrogen)
-P (Phosphorus)
-K (Potassium)
-Temperature
-Humidity
-pH
-Rainfall
-You can download the datasets from the following links:
-
-- https://github.com/uttamseervi/hackathon/blob/main/backend/datasets/Crop_Prices_2023.csv
-- https://github.com/uttamseervi/hackathon/blob/main/backend/datasets/Crop_recommendation.csv
+### Dataset Links:
+- [Crop Prices 2023](https://github.com/uttamseervi/hackathon/blob/main/backend/datasets/Crop_Prices_2023.csv)  
+- [Crop Recommendation](https://github.com/uttamseervi/hackathon/blob/main/backend/datasets/Crop_recommendation.csv)
 
 ## Installation
 
-To run this project, clone this repository and install the required dependencies.
+To run this project, follow these steps:
 
-```bash
-git clone https://github.com/uttamseervi/hackathon.git
-cd hackathon
-cd frontend
-npm i
-npm run dev // this will start the frontend
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/uttamseervi/hackathon.git
+   cd hackathon
+2. **Run the frontend:**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev  # Start the frontend server
+3. **Run the Backend:**
+   ```bash
+   cd ../backend/nodeBackend
+   npm install
+   npm run dev  # Start the backend server
+4. **Run the Model Server:**
+   ```bash
+   pip install flask scikit-learn
+   python main.py  # Start the model server
 
-cd backend
-cd nodeBackend
-npm i 
-npm run dev // this will run the node server
 
-pip install flask scikit-learn
-python main.py // runs the model server
